@@ -2,22 +2,32 @@
 # Dependencies
 node_modules/
 
-# Build outputs
-dist/
+# Database
+rank1.db
 
-# Environment variables
+# Environment
 .env
 .env.local
-.env.*
-
-# IDE files
-.vscode/
-.idea/
+*.env.*
 
 # Logs
 *.log
 
-# OS generated files
+# Temporary files
+*.tmp
+
+# Editor/IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
 .DS_Store
 Thumbs.db
+
+# Build outputs
+dist/
+build/
+target/
 ```
