@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🎯 学年 1 位製造 AI</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Helvetica Neue', Arial, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    header {
+      text-align: center;
+      color: white;
+      margin-bottom: 30px;
+    }
+
+    header h1 {
+      font-size: 2.5em;
+      margin-bottom: 10px;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    }
+
+    header p {
+      font-size: 1.1em;
+      opacity: 0.9;
+    }
+
+    .card {
+      background: white;
+      border-radius: 15px;
+      padding: 25px;
+      margin-bottom: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+
+    .card h2 {
+      color: #667eea;
+      margin-bottom: 20px;
+      font-size: 1.5em;
+      border-bottom: 2px solid #667eea;
+      padding-bottom: 10px;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+      color: #333;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      font-size: 1em;
+      transition: border-color 0.3s;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+
+    button {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      padding: 15px 30px;
+      border-radius: 8px;
+      font-size: 1.1em;
+      cursor: pointer;
+      width: 100%;
+      font-weight: bold;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+    }
+
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .result-section {
+      display: none;
+    }
+
+    .result-section.active {
+      display: block;
+    }
+
+    .prediction-box {
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      color: white;
+      padding: 20px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .prediction-box .score {
+      font-size: 3em;
+      font-weight: bold;
+      margin: 10px 0;
+    }
+
+    .prediction-box .label {
+      font-size: 0.9em;
+      opacity: 0.9;
+    }
+
+    .status-good {
+      background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%) !important;
+    }
+
+    .status-warning {
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%) !important;
+    }
+
+    .study-plan-list {
+      list-style: none;
+    }
+
+    .study-plan-list li {
+      padding: 12px;
+      margin-bottom: 10px;
+      background: #f8f9fa;
+      border-radius: 8px;
+      border-left: 4px solid #667eea;
+    }
+
+    .problem-card {
+      background: #f8f9fa;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 15px;
+      border: 2px solid #e0e0e0;
+    }
+
+    .problem-card .question {
+      font-weight: bold;
+      margin-bottom: 10px;
+      color: #333;
+    }
+
+    .problem-card .answer {
+      display: none;
+      color: #38ef7d;
+      font-weight: bold;
+      margin-top: 10px;
+      padding: 10px;
+      background: white;
+      border-radius: 5px;
+    }
+
+    .problem-card .answer.show {
+      display: block;
+    }
+
+    .problem-card button {
+      background: #667eea;
+      padding: 8px 15px;
+      font-size: 0.9em;
+      width: auto;
+    }
+
+    .weakness-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .weakness-tag {
+      background: #ffe0e0;
+      color: #c0392b;
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 0.9em;
+    }
+
+    .next-action {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 20px;
+      border-radius: 10px;
+      text-align: center;
+      font-size: 1.2em;
+      font-weight: bold;
+      margin-top: 20px;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: white;
+      font-size: 1.2em;
+    }
+
+    .spinner {
+      border: 4px solid rgba(255,255,255,0.3);
+      border-top: 4px solid white;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 20px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .analysis-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin-top: 15px;
+    }
+
+    .analysis-item {
+      background: #f8f9fa;
+      padding: 15px;
+      border-radius: 8px;
+    }
+
+    .analysis-item h4 {
+      color: #667eea;
+      margin-bottom: 8px;
+      font-size: 0.9em;
+    }
+
+    .analysis-item ul {
+      list-style: none;
+      font-size: 0.9em;
+    }
+
+    .analysis-item ul li {
+      padding: 3px 0;
+    }
+
+    .analysis-item ul li:before {
+      content: "✓ ";
+      color: #38ef7d;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>🎯 学年 1 位製造 AI</h1>
+      <p>最短で学年 1 位を取るための最適化学習戦略</p>
+    </header>
+
+    <!-- Input Form -->
+    <div class="card">
+      <h2>📝 学習情報を入力</h2>
+      <form id="studyForm">
+        <div class="form-group">
+          <label for="subject">教科名</label>
+          <select id="subject" required>
+            <option value="">選択してください</option>
+            <option value="数学">数学</option>
+            <option value="英語">英語</option>
+            <option value="国語">国語</option>
+            <option value="理科">理科</option>
+            <option value="社会">社会</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="range">テスト範囲</label>
+          <input type="text" id="range" placeholder="例：二次関数、図形、確率" required>
+        </div>
+
+        <div class="form-group">
+          <label for="currentScore">現在の点数（前回テスト）</label>
+          <input type="number" id="currentScore" min="0" max="100" placeholder="60" required>
+        </div>
+
+        <div class="form-group">
+          <label for="daysUntilTest">テストまであと何日？</label>
+          <input type="number" id="daysUntilTest" min="1" max="30" placeholder="7" required>
+        </div>
+
+        <div class="form-group">
+          <label for="userId">ユーザー ID（任意・初回は自動生成）</label>
+          <input type="text" id="userId" placeholder="空欄で OK">
+        </div>
+
+        <button type="submit" id="generateBtn">
+          🚀 学習戦略を生成
+        </button>
+      </form>
+    </div>
+
+    <!-- Loading -->
+    <div id="loading" class="loading" style="display: none;">
+      <div class="spinner"></div>
+      <p>最適な学習戦略を分析中...</p>
+    </div>
+
+    <!-- Results -->
+    <div id="results" class="result-section">
+      <!-- Prediction -->
+      <div class="card">
+        <h2>📊 点数予測</h2>
+        <div id="predictionBox" class="prediction-box">
+          <div class="label">現在の点数</div>
+          <div class="score" id="currentScoreDisplay">--</div>
+          <div class="label">予測点数 → 学年 1 位ライン</div>
+          <div style="font-size: 1.5em; margin-top: 10px;">
+            <span id="predictedScore">--</span>点 → <span id="rank1Line">--</span>点
+          </div>
+          <div id="gapMessage" style="margin-top: 15px; font-size: 1.1em;"></div>
+        </div>
+      </div>
+
+      <!-- Analysis -->
+      <div class="card">
+        <h2>🔍 テスト範囲分析</h2>
+        <div id="analysisContent">
+          <div class="analysis-grid">
+            <div class="analysis-item">
+              <h4>重要ポイント</h4>
+              <ul id="keyPointsList"></ul>
+            </div>
+            <div class="analysis-item">
+              <h4>頻出テーマ</h4>
+              <ul id="frequentTopicsList"></ul>
+            </div>
+            <div class="analysis-item">
+              <h4>得点のコツ</h4>
+              <p id="tipsText" style="font-size: 0.9em; line-height: 1.6;"></p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Weaknesses -->
+      <div class="card">
+        <h2>⚠️ 推定弱点</h2>
+        <div class="weakness-tags" id="weaknessTags"></div>
+      </div>
+
+      <!-- Study Plan -->
+      <div class="card">
+        <h2>📅 今日の学習計画</h2>
+        <ul class="study-plan-list" id="studyPlanList"></ul>
+      </div>
+
+      <!-- Problems -->
+      <div class="card">
+        <h2>✏️ 実践問題（弱点対策）</h2>
+        <div id="problemsList"></div>
+      </div>
+
+      <!-- Next Action -->
+      <div class="next-action" id="nextAction"></div>
+    </div>
+  </div>
+
+  <script>
+    let currentUserId = localStorage.getItem('rank1_userId') || '';
+
+    document.getElementById('userId').value = currentUserId;
+
+    document.getElementById('studyForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const subject = document.getElementById('subject').value;
+      const range = document.getElementById('range').value;
+      const currentScore = parseInt(document.getElementById('currentScore').value);
+      const daysUntilTest = parseInt(document.getElementById('daysUntilTest').value);
+      let userId = document.getElementById('userId').value || currentUserId;
+
+      if (!subject || !range || !currentScore || !daysUntilTest) {
+        alert('すべての項目を入力してください');
+        return;
+      }
+
+      // Show loading
+      document.getElementById('loading').style.display = 'block';
+      document.getElementById('results').classList.remove('active');
+      document.getElementById('generateBtn').disabled = true;
+
+      try {
+        // Create user if needed
+        if (!userId) {
+          const userRes = await fetch('/api/user', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name: 'ユーザー', gradeLevel: '中学 3 年生' })
+          });
+          const userData = await userRes.json();
+          userId = userData.userId;
+          currentUserId = userId;
+          localStorage.setItem('rank1_userId', userId);
+          document.getElementById('userId').value = userId;
+        }
+
+        // Get study strategy
+        const res = await fetch('/api/study-strategy', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            userId,
+            subject,
+            range,
+            currentScore,
+            daysUntilTest
+          })
+        });
+
+        const data = await res.json();
+
+        // Display results
+        displayResults(data);
+
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('results').classList.add('active');
+
+      } catch (error) {
+        console.error(error);
+        alert('エラーが発生しました。もう一度お試しください。');
+        document.getElementById('loading').style.display = 'none';
+      } finally {
+        document.getElementById('generateBtn').disabled = false;
+      }
+    });
+
+    function displayResults(data) {
+      // Prediction
+      const pred = data.prediction;
+      document.getElementById('currentScoreDisplay').textContent = pred.current;
+      document.getElementById('predictedScore').textContent = pred.predicted;
+      document.getElementById('rank1Line').textContent = pred.rank1Line;
+
+      const predictionBox = document.getElementById('predictionBox');
+      const gapMessage = document.getElementById('gapMessage');
+
+      if (pred.canReachRank1) {
+        predictionBox.className = 'prediction-box status-good';
+        gapMessage.textContent = `✅ この調子で頑張れば学年 1 位達成可能です！`;
+      } else {
+        predictionBox.className = 'prediction-box status-warning';
+        gapMessage.textContent = `⚠️ 学年 1 位まであと${Math.round(pred.gap)}点不足。1 日${pred.requiredDailyStudy}時間の追加学習が必要です。`;
+      }
+
+      // Analysis
+      const analysis = data.analysis;
+      document.getElementById('keyPointsList').innerHTML = analysis.keyPoints.map(p => `<li>${p}</li>`).join('');
+      document.getElementById('frequentTopicsList').innerHTML = analysis.frequentTopics.map(t => `<li>${t}</li>`).join('');
+      document.getElementById('tipsText').textContent = analysis.tips;
+
+      // Weaknesses
+      document.getElementById('weaknessTags').innerHTML = data.weakness.map(w => 
+        `<span class="weakness-tag">${w}</span>`
+      ).join('');
+
+      // Study Plan
+      document.getElementById('studyPlanList').innerHTML = data.study_plan.map(task => 
+        `<li>${task}</li>`
+      ).join('');
+
+      // Problems
+      const problemsHtml = data.problems.map((prob, idx) => `
+        <div class="problem-card">
+          <div class="question">問${idx + 1}: ${prob.question}</div>
+          <button onclick="toggleAnswer(${idx})">答えを見る</button>
+          <div class="answer" id="answer${idx}">
+            <div>正解：${prob.answer}</div>
+            <div style="margin-top: 5px; font-size: 0.9em; color: #666;">${prob.explanation}</div>
+          </div>
+        </div>
+      `).join('');
+      document.getElementById('problemsList').innerHTML = problemsHtml;
+
+      // Next Action
+      document.getElementById('nextAction').textContent = data.next_action;
+    }
+
+    function toggleAnswer(idx) {
+      const answerDiv = document.getElementById(`answer${idx}`);
+      answerDiv.classList.toggle('show');
+    }
+  </script>
+</body>
+</html>
