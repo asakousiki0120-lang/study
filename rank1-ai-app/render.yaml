@@ -1,22 +1,22 @@
 services:
   - type: web
-    name: rank1-ai-app
+    name: rank1-ai-study
     env: node
-    region: tokio
+    region: oregon
     plan: free
     buildCommand: npm install
-    startCommand: npm run start:render
+    startCommand: node server-render.js
     envVars:
       - key: NODE_ENV
         value: production
-      - key: PORT
-        value: 3000
       - key: DATABASE_URL
         fromDatabase:
-          name: rank1-db
+          name: study-db
           property: connectionString
 
-  - type: pserv
-    name: rank1-db
+databases:
+  - name: study-db
+    databaseName: study_db
+    user: study_user
     plan: free
-    databaseName: rank1db
+    region: oregon
